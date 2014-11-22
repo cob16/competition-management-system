@@ -30,14 +30,17 @@ public class DoubleElimination implements IManager {
 						
 		if (losersBracketPlayers.size() == 1 && losersBracketMatches.size() == 0 && winnersBracketPlayers.size() == 1 && winnersBracketMatches.size() == 0) {	
 			System.out.println("last match");
+			currentMatchBracket = null;
 			return new Match(winnersBracketPlayers.Remove(), losersBracketPlayers.Remove());
 		} 
 		else if (winnersBracketMatches.size() > losersBracketMatches.size()) {
 			System.out.println("winner pool match");
+			currentMatchBracket = winnersBracketMatches;
 			return winnersBracketMatches.Remove();
 		}
 		else  {
 			System.out.println("loosers pool match");
+			currentMatchBracket = losersBracketMatches;
 			return losersBracketMatches.Remove(); //will return this if equal as per requirment
 		}
 	}
@@ -112,6 +115,13 @@ public class DoubleElimination implements IManager {
 			if (player1)
 				matchOutcomeLosers(currentMatch.getPlayer1());
 			else matchOutcomeLosers(currentMatch.getPlayer2());
+		}
+		else if (currentMatchBracket == null && currentMatch != null) {//Special case for last match played
+			if (player1 == false) {
+				String playerSwap1 = currentMatch.getPlayer1();
+				String playerSwap2 = currentMatch.getPlayer2();
+				currentMatch = new Match(playerSwap2, playerSwap1);
+			}
 		}
 		else throw new NoCurrentMatchException("There must be a current match before you can set the winner of one. Avoid this by calling nextMatch() first");
 		results = true;

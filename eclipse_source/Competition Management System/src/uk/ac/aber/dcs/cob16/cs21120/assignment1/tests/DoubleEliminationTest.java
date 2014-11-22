@@ -85,8 +85,8 @@ public class DoubleEliminationTest {
 			fullmanager.setMatchWinner(true);
 		}
 		
-		assertEquals("competitor2" ,fullmanager.getPosition(0));
-		assertEquals("competitor3" ,fullmanager.getPosition(1));
+		assertEquals("competitor1" ,fullmanager.getPosition(0));
+		assertEquals("competitor2" ,fullmanager.getPosition(1));
 	}
 	
 

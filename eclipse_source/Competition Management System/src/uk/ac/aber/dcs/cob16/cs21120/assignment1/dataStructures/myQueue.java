@@ -42,11 +42,8 @@ public class myQueue <E extends Object> {
 		}
 
 	}
-	
 
-	private Object[] DoubbleArraySize(Object o[]) { // expects a full array as
-													// input, puts the que in
-													// order from index 0
+	private Object[] DoubbleArraySize(Object o[]) { // expects a full array as input, puts the que in order from index 0
 
 		int numElemintsFromHeadToEndOfArray = o.length - qHead;
 
@@ -54,7 +51,6 @@ public class myQueue <E extends Object> {
 		System.arraycopy(o, qHead, newArr, 0, numElemintsFromHeadToEndOfArray); // Copy from the head to end of array
 
 		if (qTail < qHead) { 
-			
 			System.arraycopy(o, 0, newArr, numElemintsFromHeadToEndOfArray, o.length); // Copy any remaining elements have wrapped around to the begging of the array
 		}
 		return newArr;
