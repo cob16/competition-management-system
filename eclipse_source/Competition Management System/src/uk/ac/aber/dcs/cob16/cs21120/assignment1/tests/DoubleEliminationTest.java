@@ -1,4 +1,4 @@
-package uk.ac.aber.dcs.cob16.cs21120.assignment1.tests;
+package uk.ac.aber.dcs.cob16.cs21120.assignment1.tests; 
 
 import static org.junit.Assert.*;
 

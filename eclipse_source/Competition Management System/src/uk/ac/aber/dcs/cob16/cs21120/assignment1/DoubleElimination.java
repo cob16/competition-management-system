@@ -21,16 +21,25 @@ public class DoubleElimination implements IManager {
 		
 	private Match determineNextMatch() {
 		
+		
 		makeNewMatches(winnersBracketPlayers, winnersBracketMatches);
 		makeNewMatches(losersBracketPlayers, losersBracketMatches);
 		
-		if (losersBracketPlayers.size() > 1 || losersBracketMatches.size() > 0 || winnersBracketPlayers.size() > 1 || winnersBracketMatches.size() > 0) {
+		System.out.println(winnersBracketMatches.size());
+		System.out.println(losersBracketMatches.size());
+						
+		if (losersBracketPlayers.size() == 1 && losersBracketMatches.size() == 0 && winnersBracketPlayers.size() == 1 && winnersBracketMatches.size() == 0) {	
+			System.out.println("last match");
 			return new Match(winnersBracketPlayers.Remove(), losersBracketPlayers.Remove());
 		} 
 		else if (winnersBracketMatches.size() > losersBracketMatches.size()) {
+			System.out.println("winner pool match");
 			return winnersBracketMatches.Remove();
 		}
-		else return losersBracketMatches.Remove(); //will return this if equal as per requirment
+		else  {
+			System.out.println("loosers pool match");
+			return losersBracketMatches.Remove(); //will return this if equal as per requirment
+		}
 	}
 	
 	@Override
@@ -50,7 +59,7 @@ public class DoubleElimination implements IManager {
 	@Override
 	public boolean hasNextMatch() {
 		isPlayers();
-		return 	(losersBracketPlayers.size() > 0 || losersBracketMatches.size() > 0 ||	winnersBracketPlayers.size() > 0 || winnersBracketMatches.size() > 0);
+		return 	((losersBracketPlayers.size() > 0 || winnersBracketPlayers.size() > 0) || (losersBracketMatches.size() > 0 || winnersBracketMatches.size() > 0));
 	}
 	
 	private void isPlayers() throws NoNextMatchException {
@@ -82,6 +91,7 @@ public class DoubleElimination implements IManager {
 		if (results) {
 			if (hasNextMatch()) {
 				currentMatch = determineNextMatch();
+				System.out.println(currentMatch.getPlayer1());
 				results = false;
 				return currentMatch;
 			}
@@ -113,7 +123,7 @@ public class DoubleElimination implements IManager {
 		winnersBracketPlayers = new myQueue<String>(players.toArray());
 		winnersBracketMatches = new myQueue<Match>();
 		
-		losersBracketPlayers = new myQueue<String>( (players.size() / 2) );
+		losersBracketPlayers = new myQueue<String>();
 		losersBracketMatches = new myQueue<Match>();
 		
 		makeNewMatches(winnersBracketPlayers, winnersBracketMatches);
