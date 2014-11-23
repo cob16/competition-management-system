@@ -15,7 +15,7 @@ import uk.ac.aber.dcs.cob16.cs21120.assignment1.dataStructures.myStack;
  * @author cormac
  *
  */
-public class BubbleElimination implements IManager {
+public class BubbleEliminationFull implements IManager {
 		
 	private Player Tournament[];
 
@@ -25,18 +25,21 @@ public class BubbleElimination implements IManager {
 	private Boolean currentPlayerLoss = true;
 	
 	private Match currentMatch;
-
+	
+	private int round;
+	private Boolean roundOver = true;
 	private String winners[];
 	
-	//boolean roundsOver = false;
+	boolean roundsOver = false;
+	
 	
 	/* (non-Javadoc)
 	 * @see uk.ac.aber.dcs.bpt.cs21120.assignment1.IManager#setPlayers(java.util.ArrayList)
 	 */
 	@Override
 	public void setPlayers(ArrayList<String> players) {
-
-		winners = new String[1];	
+		round = 0;
+		winners = new String[players.size()];		
 		Tournament = new Player[players.size() + 1];
 		Tournament[0] = null;  //we are starting at 1 so we do not have to -1 loads later
 		
@@ -68,8 +71,7 @@ public class BubbleElimination implements IManager {
 	public boolean hasNextMatch() {
 		
 		isPlayers();
-		if (roundOrder.isEmpty()) { //if the last winner is found
-			winners[0] = Tournament[1].getName();
+		if (roundsOver) { //if the last winner is found
 			return false;
 		}
 		return true;
@@ -97,7 +99,18 @@ public class BubbleElimination implements IManager {
 
 	private Match determineNextMatch() {
 		
-		currentMatch = BubbleUpMatchMaker();
+		if (winners[0] == null) {
+			if (roundOrder.isEmpty()) {
+				currentMatch = new Match(null, null);
+				currentMatch = BubbleDownMatchMaker();
+			} else {
+				System.out.println("there is more to be done for the first round");
+				currentMatch = BubbleUpMatchMaker();
+			}
+		} else {
+			currentMatch = BubbleDownMatchMaker();
+		}
+		
 		return currentMatch;
 	}
 	/*
@@ -120,7 +133,7 @@ public class BubbleElimination implements IManager {
 	private int findPlayerIndex(String player){
 		if (player != null) {
 			int i;
-			for (i = 1;  i < Tournament.length; i++) {
+			for (i = 1;  i < Tournament.length - round; i++) {
 				System.out.println(Tournament[i].getName());
 				if (Tournament[i].getName().equals(player)){
 					return i;
@@ -143,12 +156,98 @@ public class BubbleElimination implements IManager {
 		System.out.println("oponnent" + oponnent); 
 		return new Match(currentPlayer, oponnent);
 	}
+	
+	private void nextRound(){
 		
+		if ((Tournament.length - 1) - round < 3) {
+			roundsOver = true;
+		}
+		
+		winners[round] = Tournament[1].getName();
+		System.out.println(round + "th winner found: " + winners[round]);
+		
+		int lastElimint = (Tournament.length - 1) - round;
+		Tournament[1].setName(Tournament[lastElimint].getName());
+		Tournament[lastElimint] = null;
+		if (lastElimint % 2 == 0) {
+			 Tournament[lastElimint / 2].setLeftChild(null);
+		} else 	Tournament[lastElimint / 2].setRightChild(null);
+		
+		currentPlayer = Tournament[1].getName();
+		round++;
+		roundOver = false;
+	}
+	
+	private Match BubbleDownMatchMaker(){
+		if (roundOver) {
+			nextRound();
+		}
+		
+		int currentLocation = findPlayerIndex(currentPlayer);
+			
+		int leftChild  = findPlayerIndex(Tournament[currentLocation].getLeftChild());
+		int rightChild = findPlayerIndex(Tournament[currentLocation].getRightChild());
+		
+		if (leftChild == 0 && rightChild == 0) {//bottem of tree
+			roundOver = true;
+		}
+			
+		if (currentMatch.getPlayer1() == null && currentMatch.getPlayer2() == null) {// calls on round after first
+			return new Match(currentPlayer, Tournament[leftChild].getName());
+		}	
+		
+		if (currentMatch.getPlayer1().equals(currentPlayer) &&
+			currentMatch.getPlayer2().equals(Tournament[leftChild].getName())){ //PARENT V LEFT
+			if (rightChild == 0) {
+				roundOver = true; //STOP condition
+			}
+			if (currentPlayerLoss) {
+				return new Match(Tournament[leftChild].getName(), Tournament[rightChild].getName());
+			} else {
+				return new Match(currentPlayer, Tournament[rightChild].getName());
+			}
+		} else if (currentMatch.getPlayer1().equals(currentPlayer) &&
+				 currentMatch.getPlayer2().equals(Tournament[rightChild].getName())){ //PARENT V RIGHT
+			
+			if (currentPlayerLoss) {
+				Swap(currentPlayer, currentMatch.getPlayer2());
+				return new Match(currentPlayer, Tournament[leftChild].getName());
+			}
+			else {
+				roundOver = true; //STOP condition
+			}
+		} else if (currentMatch.getPlayer1().equals(Tournament[leftChild].getName()) &&
+				 currentMatch.getPlayer2().equals(Tournament[rightChild].getName())){
+			
+			if (currentPlayerLoss) {
+				Swap(currentPlayer, currentMatch.getPlayer2());
+				return new Match(currentPlayer, Tournament[leftChild].getName());
+			} else {
+				Swap(currentPlayer, currentMatch.getPlayer1());
+				return new Match(currentPlayer, Tournament[leftChild].getName());
+			}
+		} 
+		return new Match(currentPlayer, Tournament[leftChild].getName());
+	}
+	
 	private void Swap(String parent, String child){
 		Tournament[findPlayerIndex(parent)].setName(child);	
 		Tournament[findPlayerIndex(child)].setName(parent);
-	 }
+		
+		if (findPlayerIndex(parent) > 1) {
+			if(findPlayerIndex(child) > 1 && findPlayerIndex(child) % 2 == 0) {
+				Tournament[findPlayerIndex(findMyParent(child))].setLeftChild(child);
+			}else Tournament[findPlayerIndex(findMyParent(child))].setRightChild(child);
+		}
+		if (findPlayerIndex(parent) > 1) {
+			if(findPlayerIndex(parent) % 2 == 0) {
+				Tournament[findPlayerIndex(findMyParent(parent))].setLeftChild(parent);
+			}else Tournament[findPlayerIndex(findMyParent(parent))].setRightChild(parent);
+		}
+	}
 	
+	
+
 	/* (non-Javadoc)
 	 * @see uk.ac.aber.dcs.bpt.cs21120.assignment1.IManager#setMatchWinner(boolean)
 	 */
@@ -175,8 +274,7 @@ public class BubbleElimination implements IManager {
 	 */
 	@Override
 	public String getPosition(int n) {
-		// if (n < winners.length - 1 &&  n >= 0 ) {
-		if (n < 1) {
+		if (n < winners.length - 1 &&  n >= 0 ) {
 			return winners[n];
 		} else return null;
 	}

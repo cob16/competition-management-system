@@ -35,7 +35,9 @@ public class myStack <E extends Object> {
 	 * @return true if empty else false
 	 */
 	public boolean isEmpty() {
-		if (stack.size() == 0) {return true;} 
+		if (stack.size() == 0) {
+			return true;
+		} 
 		else return false;
 	}
 	/*

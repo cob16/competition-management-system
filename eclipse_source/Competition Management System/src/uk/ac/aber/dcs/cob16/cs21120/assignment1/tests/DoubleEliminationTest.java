@@ -25,11 +25,12 @@ public class DoubleEliminationTest {
 		
 		fullmanager = IManagerFactory.getManager("uk.ac.aber.dcs.cob16.cs21120.assignment1.DoubleElimination");
 		
-		ArrayList<String> competitors = new ArrayList<String>();
-		competitors.add("competitor1");
-		competitors.add("competitor2");
-		competitors.add("competitor3");
-		competitors.add("competitor4");
+		ArrayList<String> competitors = new ArrayList<String>() {{
+			add("competitor1");
+			add("competitor2");
+			add("competitor3");
+			add("competitor4");
+		}};
 		
 		fullmanager.setPlayers(competitors);
 	}
